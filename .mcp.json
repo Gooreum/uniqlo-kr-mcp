@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "uniqlo-kr": {
+      "command": "node",
+      "args": ["/Users/minguseo/Desktop/ShoppingMCP/build/index.js"]
+    }
+  }
+}
