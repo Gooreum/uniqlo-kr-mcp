@@ -81,6 +81,16 @@ npm run dev
 
 Custom GPT 생성 → Actions → MCP server URL 입력
 
+## 아키텍처 다이어그램
+
+MCP 개념(Host/Client/Server, Transport, Lifecycle 등)과 이 서버의 구현 구조를 시각화한 다이어그램.
+
+```bash
+open mcp-diagram.html
+```
+
+> 브라우저에서 열면 전체 구조도를 볼 수 있다.
+
 ## 프로젝트 구조
 
 ```
