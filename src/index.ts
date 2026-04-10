@@ -10,6 +10,7 @@ import {
   getStores,
 } from "./uniqlo-api.js";
 import type { L2Item } from "./types.js";
+import { diagramHtml } from "./diagram.js";
 
 function createMcpServer(): McpServer {
   const server = new McpServer({
@@ -268,6 +269,8 @@ app.use(
 );
 
 app.get("/health", (c) => c.json({ status: "ok" }));
+
+app.get("/diagram", (c) => c.html(diagramHtml));
 
 app.all("/mcp", async (c) => {
   const transport = new WebStandardStreamableHTTPServerTransport();
