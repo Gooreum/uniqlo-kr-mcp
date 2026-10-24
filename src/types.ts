@@ -33,6 +33,34 @@ export interface ProductItem {
 
 export interface L2sResult {
   l2s: L2Item[];
+  stocks: Record<string, L2Stock>;
+  prices: Record<string, L2Price>;
+}
+
+export interface L2Stock {
+  statusCode: string;
+  quantity: number;
+  statusLocalized: string;
+}
+
+export interface L2Price {
+  base: { value: number };
+  promo: { value: number } | null;
+}
+
+export interface ProductOption {
+  code: string;
+  displayCode: string;
+  name: string;
+  display?: { showFlag: boolean };
+}
+
+export interface ProductDetailResult {
+  productId: string;
+  name: string;
+  colors: ProductOption[];
+  sizes: ProductOption[];
+  plds: ProductOption[];
 }
 
 export interface L2Item {
@@ -44,10 +72,6 @@ export interface L2Item {
   sales: boolean;
   salesType: string;
   searchInStoresAvailable: boolean;
-  stock?: {
-    statusCode: string;
-    status: string;
-  };
 }
 
 export interface StoreStockResult {

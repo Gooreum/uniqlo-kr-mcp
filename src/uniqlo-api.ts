@@ -2,6 +2,7 @@ import type {
   UniqloApiResponse,
   ProductSearchResult,
   L2sResult,
+  ProductDetailResult,
   StoreStockResult,
   StoreListResult,
 } from "./types.js";
@@ -13,15 +14,22 @@ const HEADERS = {
   Accept: "application/json",
 };
 
+export class UniqloApiError extends Error {}
+
 async function apiFetch<T>(path: string): Promise<T> {
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url, { headers: HEADERS });
   if (!res.ok) {
-    throw new Error(`HTTP ${res.status}: ${url}`);
+    throw new UniqloApiError(`유니클로 서버 응답 오류 (HTTP ${res.status})`);
   }
   const data = (await res.json()) as UniqloApiResponse<T>;
   if (data.status !== "ok") {
-    throw new Error(`API error: ${JSON.stringify(data.error)}`);
+    const notFound = data.error?.httpStatusCode === 404;
+    throw new UniqloApiError(
+      notFound
+        ? "요청한 상품/옵션을 찾을 수 없습니다. ID를 다시 확인해 주세요."
+        : `유니클로 API 오류 (code ${data.error?.code ?? "?"})`
+    );
   }
   return data.result;
 }
@@ -34,6 +42,12 @@ export async function searchProducts(query: string, limit = 10, offset = 0) {
   });
   return apiFetch<ProductSearchResult>(
     `/kr/api/commerce/v5/ko/products?${params}`
+  );
+}
+
+export async function getProductDetail(productId: string) {
+  return apiFetch<ProductDetailResult>(
+    `/kr/api/commerce/v5/ko/products/${productId}/price-groups/00/details`
   );
 }
 
@@ -61,11 +75,12 @@ export async function getStoreStock(
   );
 }
 
-export async function getStores(limit = 20, offset = 0) {
+export async function getStores(limit = 20, offset = 0, keyword?: string) {
   const params = new URLSearchParams({
     limit: String(limit),
     offset: String(offset),
   });
+  if (keyword) params.set("keyword", keyword);
   return apiFetch<StoreListResult>(
     `/kr/api/commerce/v5/ko/stores?${params}`
   );
