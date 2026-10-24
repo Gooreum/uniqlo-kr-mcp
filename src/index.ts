@@ -253,18 +253,22 @@ function createMcpServer(): McpServer {
     {
       title: "매장 목록 조회",
       description:
-        "유니클로 한국 매장 목록 조회. 매장 이름, 주소, 영업시간, 위치 정보를 반환합니다.",
+        "유니클로 한국 매장 목록 조회. 매장 이름, 주소, 영업시간, 위치 정보를 반환합니다. keyword로 매장명/지역 검색 가능.",
       inputSchema: {
+        keyword: z.string().optional().describe("매장명/지역 검색어 (예: '강남', '홍대')"),
         limit: z.number().int().min(1).max(50).optional().default(20).describe("조회할 매장 수"),
         offset: z.number().int().min(0).optional().default(0).describe("페이지 오프셋"),
       },
     },
-    async ({ limit, offset }) =>
+    async ({ keyword, limit, offset }) =>
       safe(async () => {
-        const result = await getStores(limit, offset);
+        const result = await getStores(limit, offset, keyword);
 
         if (!result.items || result.items.length === 0) {
-          return { content: [{ type: "text", text: "매장 정보를 찾을 수 없습니다." }] };
+          const text = keyword
+            ? `"${keyword}" 매장을 찾을 수 없습니다.`
+            : "매장 정보를 찾을 수 없습니다.";
+          return { content: [{ type: "text", text }] };
         }
 
         const lines = [
